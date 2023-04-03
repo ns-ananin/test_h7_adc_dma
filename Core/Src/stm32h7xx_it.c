@@ -203,9 +203,8 @@ void SysTick_Handler(void)
   */
 void DMA1_Stream0_IRQHandler(void)
 {
-	extern void processADCvalues(char isFullBuffer);
   /* USER CODE BEGIN DMA1_Stream0_IRQn 0 */
-	static uint32_t counter = 0; 
+	extern void processADCvalues(char isFullBuffer);
 	if(LL_DMA_IsActiveFlag_HT0(DMA1) != RESET)
 	{
 		LL_DMA_ClearFlag_HT0(DMA1);
@@ -215,11 +214,6 @@ void DMA1_Stream0_IRQHandler(void)
 	{
 		LL_DMA_ClearFlag_TC0(DMA1);
 		processADCvalues(1);
-	}
-	counter++;
-	if(counter >= 1000){
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, !HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_14));
-		counter = 0;
 	}
   /* USER CODE END DMA1_Stream0_IRQn 0 */
 
