@@ -32,6 +32,8 @@
 	* 
 	* Получившийся проект добавил в систему контроля версий GIT (исключил папку с obj файлами и файлы настройки отладчика) и выложил в публичный репозиторий GitHub:
 	* https://github.com/ns-ananin/test_h7_adc_dma.git
+	*
+	* Проект STM32CubeMX находится в репозитории.
   *
   ******************************************************************************
   */
@@ -81,11 +83,11 @@ static uint32_t numberMeasurements = 0;
 /// Кол-во полученных измерений за 1 секунду.
 #define numberMeasPerSecond 1000
 /// Среднее кол-во отсчетов АЦП за секунду.
-static uint32_t averageMeasPerSecond = 0;
+static volatile uint32_t averageMeasPerSecond = 0;
 /// Флаг, который показывает, что готово новое среднее за секунду.
-static char isReadyAverageMeasPerSecond = 0;
+static volatile char isReadyAverageMeasPerSecond = 0;
 /// Флаг, который показывает, что идет расчет напряжения и вывод его на экран.
-static char isCulcVoltage = 0;
+static volatile char isCulcVoltage = 0;
 /// Максимальное значение, которое может быть получено с АЦП.
 #define maximumADCvalue 65535
 /// Значение опорного напряжения АЦП, в мВ.
@@ -193,6 +195,8 @@ int main(void)
 			isReadyAverageMeasPerSecond = 0;// Сбрасываем флаг, готовности нового измерения.
 			// Расчитываем значение среднего напряжения за секунду.
 			isCulcVoltage = 1; // Блокируем изменение переменной averageMeasPerSecond в прерывании пока производится копирование.
+			// На данной архитектуре можно было обойтись без синхронизации, так как переменная 4 байта и выровнена в памяти, 
+			// то операция копирования является атомарной. Но решил подстрахлваться и написать код универсальный.
 			uint32_t voltage = averageMeasPerSecond;
 			isCulcVoltage = 0;
 			voltage = (voltage * ADCreferenceVoltage) / maximumADCvalue;
