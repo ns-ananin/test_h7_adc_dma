@@ -11,7 +11,7 @@
 #include "stdint.h"
 
 /**
-Задать новое значение DAC.
+\brief Задать новое значение на выходе DAC.
 @param newValue новое значение, которое необходимо установить на выходе DAC, максимальное значение зависит от платформы.
 */
 void PeripheralAPI_setValueInDAC(uint32_t newValue);

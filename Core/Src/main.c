@@ -95,17 +95,13 @@ static void MX_DAC1_Init(void);
 /* USER CODE BEGIN 0 */
 
 /**
- * Обработать прерывание DMA.
+* \brief Обработать прерывание DMA.
  * @param isFullBuffer true - заполнена вторая половина буфера, false - заполнена первая половина буфера.
  */
 void handleDMAinterrupt(char isFullBuffer){
 	TestTask_processADCvalues(isFullBuffer ? &buffer[sizeBuffer] : buffer, sizeBuffer);
 }
 
-/**
-Задать новое значение DAC.
-@param newValue новое значение, которое необходимо передать в DAC, максимальное значение зависит от платформы.
-*/
 void PeripheralAPI_setValueInDAC(uint32_t newValue){
 	HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, newValue);
 }
