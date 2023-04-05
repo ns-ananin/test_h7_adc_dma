@@ -204,16 +204,16 @@ void SysTick_Handler(void)
 void DMA1_Stream0_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Stream0_IRQn 0 */
-	extern void processADCvalues(char isFullBuffer);
+	extern void handleDMAinterrupt(char isFullBuffer);
 	if(LL_DMA_IsActiveFlag_HT0(DMA1) != RESET)
 	{
 		LL_DMA_ClearFlag_HT0(DMA1);
-		processADCvalues(0);
+		handleDMAinterrupt(0);
 	}
 	if(LL_DMA_IsActiveFlag_TC0(DMA1) != RESET)
 	{
 		LL_DMA_ClearFlag_TC0(DMA1);
-		processADCvalues(1);
+		handleDMAinterrupt(1);
 	}
   /* USER CODE END DMA1_Stream0_IRQn 0 */
 

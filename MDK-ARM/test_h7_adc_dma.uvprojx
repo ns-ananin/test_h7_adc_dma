@@ -341,7 +341,7 @@
               <MiscControls></MiscControls>
               <Define>USE_FULL_LL_DRIVER,USE_HAL_DRIVER,STM32H743xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../Drivers/CMSIS/Include</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../Drivers/CMSIS/Include;..\App\TestTask</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -409,6 +409,11 @@
               <FileName>stm32h7xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Core/Src/stm32h7xx_hal_msp.c</FilePath>
+            </File>
+            <File>
+              <FileName>PeripheralAPI.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Core\Inc\PeripheralAPI.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -660,6 +665,21 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>App/TestTask</GroupName>
+          <Files>
+            <File>
+              <FileName>TestTask.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\App\TestTask\TestTask.h</FilePath>
+            </File>
+            <File>
+              <FileName>TestTask.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\App\TestTask\TestTask.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
         <Group>
@@ -702,5 +722,14 @@
       </file>
     </files>
   </RTE>
+
+  <LayerInfo>
+    <Layers>
+      <Layer>
+        <LayName>test_h7_adc_dma</LayName>
+        <LayPrjMark>1</LayPrjMark>
+      </Layer>
+    </Layers>
+  </LayerInfo>
 
 </Project>

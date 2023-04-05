@@ -43,8 +43,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "stdio.h"
 #include "EventRecorder.h"
+#include "PeripheralAPI.h"
+#include "TestTask.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -76,22 +77,7 @@ TIM_HandleTypeDef htim4;
 /// писать данные с АЦП, а другую часть обрабатывать.
 static uint16_t buffer[sizeBuffer * 2]__attribute__((section(".ARM.__at_0x24000000")));
 
-/// Переменная для накопления суммы отсчетов, чтобы рассчитать среднее значение напряжения за секунду.
-static uint32_t sumPerSecond = 0;
-/// Кол-во измерений для вычисления среднего значения за секунду.
-static uint32_t numberMeasurements = 0;
-/// Кол-во полученных измерений за 1 секунду.
-#define numberMeasPerSecond 1000
-/// Среднее кол-во отсчетов АЦП за секунду.
-static volatile uint32_t averageMeasPerSecond = 0;
-/// Флаг, который показывает, что готово новое среднее за секунду.
-static volatile char isReadyAverageMeasPerSecond = 0;
-/// Флаг, который показывает, что идет расчет напряжения и вывод его на экран.
-static volatile char isCulcVoltage = 0;
-/// Максимальное значение, которое может быть получено с АЦП.
-#define maximumADCvalue 65535
-/// Значение опорного напряжения АЦП, в мВ.
-#define ADCreferenceVoltage 3300
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -109,35 +95,21 @@ static void MX_DAC1_Init(void);
 /* USER CODE BEGIN 0 */
 
 /**
- * Обработать новые данные с АЦП.
+ * Обработать прерывание DMA.
  * @param isFullBuffer true - заполнена вторая половина буфера, false - заполнена первая половина буфера.
  */
-void processADCvalues(char isFullBuffer){
-	// Получаем указатели на новые данные. Таймер и АЦП настроены на работу с дискретность 0,1 мс.
-  uint16_t *data = isFullBuffer ? &buffer[sizeBuffer] : buffer;
-	// Находим среднее значение отсчетов за 1 мс.
-	uint32_t sum = 0;
-	for(size_t i = 0; i < sizeBuffer; i++){
-		sum += data[i];
-	}
-	uint32_t averageValue = sum / sizeBuffer; // Среднее значение отсчетов за 1 мс.
-	
-	// Выводим полученное значени в ЦАП.
-	uint32_t valueForDac = averageValue >> 4; // Переводим значение, так как ADC 16 разрядный, а DAC 12 разрядный.
-	HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, valueForDac);
-	
-	// Расчет среднего значения за секунду.
-	sumPerSecond += averageValue;
-	numberMeasurements++;
-	if(numberMeasurements >= numberMeasPerSecond && // Если накопили отсчеты за секунду.
-		!isCulcVoltage){ // Для синхронизации потоков (защита, если не успели обработать в основном цикле прошлое значение). Чтобы избежать конфликта в использовании переменной averageMeasPerSecond.
-		averageMeasPerSecond = sumPerSecond / numberMeasPerSecond;
-		sumPerSecond = numberMeasurements = 0;
-		isReadyAverageMeasPerSecond = 1;
-		// Расчет напряжения и вывод в терминал выполнен в основном цикле, чтобы сократить время обработки прерывания.
-	}
-	
+void handleDMAinterrupt(char isFullBuffer){
+	TestTask_processADCvalues(isFullBuffer ? &buffer[sizeBuffer] : buffer, sizeBuffer);
 }
+
+/**
+Задать новое значение DAC.
+@param newValue новое значение, которое необходимо передать в DAC, максимальное значение зависит от платформы.
+*/
+void PeripheralAPI_setValueInDAC(uint32_t newValue){
+	HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, newValue);
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -191,17 +163,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-		if(isReadyAverageMeasPerSecond){// Если появилось измеренное значение напряжения.
-			isReadyAverageMeasPerSecond = 0;// Сбрасываем флаг, готовности нового измерения.
-			// Расчитываем значение среднего напряжения за секунду.
-			isCulcVoltage = 1; // Блокируем изменение переменной averageMeasPerSecond в прерывании пока производится копирование.
-			// На данной архитектуре можно было обойтись без синхронизации, так как переменная 4 байта и выровнена в памяти, 
-			// то операция копирования является атомарной. Решил подстраховаться и написать универсальное решение.
-			uint32_t voltage = averageMeasPerSecond;
-			isCulcVoltage = 0;
-			voltage = (voltage * ADCreferenceVoltage) / maximumADCvalue;
-			printf("%dmV\r\n", voltage);
-		}
+		TestTask_execute();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
