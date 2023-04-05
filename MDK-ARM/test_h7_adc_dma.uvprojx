@@ -415,6 +415,16 @@
               <FileType>5</FileType>
               <FilePath>..\Core\Inc\PeripheralAPI.h</FilePath>
             </File>
+            <File>
+              <FileName>TestTask.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Core\Inc\TestTask.h</FilePath>
+            </File>
+            <File>
+              <FileName>TestTask.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\TestTask.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -661,21 +671,6 @@
               <FileName>system_stm32h7xx.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Core/Src/system_stm32h7xx.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>App/TestTask</GroupName>
-          <Files>
-            <File>
-              <FileName>TestTask.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\App\TestTask\TestTask.h</FilePath>
-            </File>
-            <File>
-              <FileName>TestTask.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\App\TestTask\TestTask.c</FilePath>
             </File>
           </Files>
         </Group>
